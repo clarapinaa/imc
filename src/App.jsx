@@ -7,7 +7,8 @@ import Textfield from '@mui/material/Texfield';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import InoutAdornment from '@mui/material/InputAdornment';
+import Button from '@mui/material/button'
+import InoutAdornment from '@mui/material/InoutAdorment';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -24,6 +25,7 @@ class Imc extends React.Component {
     this.setMasculino = this.setMasculino.bind(this);
     this.setMaior = this.setMaior.bind(this);
     this.Resultado = this.Resultado.bind (this)
+    this.enviar = this.enviar.bind (this);
     this.state = {
       peso: null,
       altura: null
@@ -89,7 +91,27 @@ resultado() {
     }      
     return resultado;    
    }   
-           
+
+    enviar() {
+    let date = new Date().toISOString();
+    date = date.replace(/([^T]+)T([^\.]+).*/g, '$1 $2');
+    let imc = this.calcular();
+    if (imc) {
+      let myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      let requestOptions = {
+          method: "post",
+          headers: myHeaders,
+          redirect: "follow",
+          body: JSON.stringify([[date,imc]])
+      };
+      fetch("<<link>>?tabId=Dados", requestOptions)
+          .then(response => response.text())
+          .then(result => console.log(result))
+          .catch(error => console.log('error', error));
+    }
+  }
+
         render() {
     return (
       <ThemeProvider theme={theme}>
@@ -115,8 +137,8 @@ label="Masculino"
 control= {<Switch onChange= {this.setMaior} />}
 label= "Maior de idade"
 />
-          </FormGroup> 
-          <TextField
+           </FormGroup> 
+           <TextField
             onChange={this.setPeso}
               margin="normal"
               required
@@ -147,6 +169,22 @@ label= "Maior de idade"
             <Typography component="h1" variant="h6">
               {this.resultado()}
             </Typography>
+          </Box> 
+          <Box
+            sx = {{
+             display: 'inline',
+             alignItems: 'center',
+           }}
+          >
+            <Button
+              onClick={this.enviar}
+              variantt='cointained'>
+              Enviar
+            </Button>
+            <Button
+              variant="contained">
+              Relatório
+            </Button>
           </Box>
         </Container>
       </ThemeProvider>
